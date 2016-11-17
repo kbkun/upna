@@ -1,0 +1,136 @@
+package kama.protocol;
+
+message Envelope {
+  // Состояние канала углов
+  optional AngleChannelState angle_channel_state = 1;
+
+  // Запрос вектора состояния
+  optional StateGettingReq state_getting_req = 2;
+  // Ответ на запрос вектора состояния
+  optional StateGettingAck state_getting_ack = 3;
+
+  // Запрос на смену таблицы с ЦУ
+  optional PointingTableSettingReq pointing_table_setting_req = 4;
+  // Положительный ответ на запрос на смену таблицы с ЦУ
+  optional PointingTableSettingAck pointing_table_setting_ack = 5;
+  // Отрицательный ответ на запрос на смену таблицы с ЦУ
+  optional PointingTableSettingNak pointing_table_setting_nak = 6;
+
+  // Запрос текущей загруженной таблицы с ЦУ
+  optional PointingTableGettingReq pointing_table_getting_req = 7;
+  // Ответ на запрос текущей загруженной таблицы с ЦУ
+  optional PointingTableGettingAck pointing_table_getting_ack = 8;
+
+  // Запрос на смену таблицы калибровочных параметров
+  optional CalibrationTableSettingReq calibration_table_setting_req = 9;
+  // Положительный ответ на запрос на смену таблицы калибровочных параметров
+  optional CalibrationTableSettingAck calibration_table_setting_ack = 10;
+  // Отрицательный ответ на запрос на смену таблицы калибровочных параметров
+  optional CalibrationTableSettingNak calibration_table_setting_nak = 11;
+
+  // Запрос текущей таблицы калибровочных параметров
+  optional CalibrationTableGettingReq calibration_table_getting_req = 12;
+  // Положительный Ответ на запрос таблицы калибровочных параметров
+  optional CalibrationTableGettingAck calibration_table_getting_ack = 13;
+}
+
+message AngleChannelState {
+  // Признак отсчета времени (1- московское время, 0 - стартовое время)
+  required int32 time_mode = 1;
+  // Время проведения измерения, строка в формате ISO 8601
+  required string time = 2;
+  // Условия сопровождения (0 – ручное управление, 1 – автосопровождение по азимуту и ручное управление по углу места,
+  // 2 – автосопровождение по углам, 4 – управление антенной по целеуказаниям из канала связи,
+  // 5 – управление антенной от внешних устройств)
+  required int32 tracking_mode = 3;
+  // Азимут – градусы
+  required double azimuth = 4;
+  // Угол места – градусы
+  required double elevation = 5;
+}
+
+message StateGettingReq {
+}
+
+message StateGettingAck {
+  required bool registration_device_connected = 1; // КНВ-008 (аппаратура приема-регистрации информации)
+  required bool pointing_device_connected = 2; // КНУ23 (устройство программного наведения)
+}
+
+message Ping {
+}
+
+message Pong {
+}
+
+message PointingTableSettingReq {
+  // Таблица ЦУ
+  required PointingTable table = 1;
+}
+
+message PointingTableSettingAck {
+}
+
+message PointingTableSettingNak {
+  // Описание ошибки в кодировке UTF-8 на русском языке
+  required string error_message = 1;
+}
+
+message PointingTableGettingReq {
+}
+
+message PointingTableGettingAck {
+  // Таблица ЦУ
+  required PointingTable table = 1;
+}
+
+message CalibrationTableSettingReq {
+  // Таблица калибровочных параметров
+  required CalibrationTable table = 1;
+}
+
+message CalibrationTableSettingAck {
+}
+
+message CalibrationTableSettingNak {
+  // Описание ошибки в кодировке UTF-8 на русском языке
+  required string error_message = 1;
+}
+
+message CalibrationTableGettingReq {
+}
+
+message CalibrationTableGettingAck {
+  // Таблица калибровочных параметров
+  required CalibrationTable table = 1;
+}
+
+message PointingTable {
+  // Время Т0 (московское время) в формате ISO 8601, если время установлено - начинать работать от него, иначе от КП
+  optional string time = 1;
+  // Тип изделия
+  optional string object_type = 2;
+  // Строки с целеуказаниями
+  repeated PointingTableItem item = 3;
+}
+
+message PointingTableItem {
+  // Время в секундах относительно КП
+  required double time = 1;
+  // Азимут – градусы
+  required double azimuth = 2;
+  // Угол места – градусы
+  required double elevation = 3;
+}
+
+message CalibrationTable {
+  // Строки с калибровочными параметрами
+  repeated CalibrationTableItem item = 3;
+}
+
+message CalibrationTableItem {
+  // Время в секундах
+  required double time = 1;
+  // Значение параметра
+  required double value = 2;
+}
